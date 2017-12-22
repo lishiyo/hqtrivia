@@ -1,0 +1,10 @@
+{
+  "GOOGLE": {
+    "CREDENTIALS_PATH": "path_to_service_credentials.json",
+    "CUSTOM_SEARCH_API_KEY": "google_custom_search_api_key",
+    "CUSTOM_SEARCH_ENGINE_ID": "google_custom_search:engine"
+  },
+  "LOCAL": {
+    "IMAGE_PATH": "path_to_iphone_screenshot.png"
+  }
+}
