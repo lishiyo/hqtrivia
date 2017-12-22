@@ -8,7 +8,7 @@ SCREENSHOT_HEIGHT = 1200
 
 def screenshot(image_path):
     # [x0, y0, x1, y1] - take top left
-    img = ImageGrab.grab(bbox=[0, 350, SCREENSHOT_WIDTH, SCREENSHOT_HEIGHT])
+    img = ImageGrab.grab(bbox=[0, 300, SCREENSHOT_WIDTH, SCREENSHOT_HEIGHT])
     img.save(image_path)
 
 if __name__ == '__main__':

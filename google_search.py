@@ -15,9 +15,12 @@ def run_query_all(question, answers):
     """
     results = []
     for answer in answers:
-        query = question + " " + answer
+        if (answer.startswith('"')):
+            query = question + " " + answer
+        else:
+            query = question + ' "' + answer + '"'
         results.append((answer, search(query)))
-    return results
+    return (question, results)
 
 def search(query):
     service = build("customsearch", "v1", developerKey=CUSTOM_SEARCH_API_KEY)
@@ -26,7 +29,6 @@ def search(query):
         cx=CUSTOM_SEARCH_ENGINE_ID,
     ).execute()
     return res['searchInformation']['formattedTotalResults']
-
 
 if __name__ == '__main__':
     search('lectures')

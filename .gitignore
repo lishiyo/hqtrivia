@@ -3,3 +3,4 @@ test/
 demos/
 credentials.json
 config.json
+output/*

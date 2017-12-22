@@ -40,41 +40,31 @@ def parse_screenshot(path):
     texts_and_bounds = detect_text_with_bounds(path)
     # 3. Parse into questions and answers
     questions_and_answers = get_questions_and_answers(*texts_and_bounds)
-    print("questions and answers: {}".format(questions_and_answers))
+    # print("{}".format(questions_and_answers))
     return questions_and_answers
-
 
 def take_screenshot(path):
     # Grab the screenshot
-    START_SCREENGRAB = time.time()
+    # START_SCREENGRAB = time.time()
     screenshot(path)
-    END_SCREENGRAB = time.time()
-    logit("SCREENGRAB", START_SCREENGRAB, END_SCREENGRAB)
-
+    # END_SCREENGRAB = time.time()
+    # logit("SCREENGRAB", START_SCREENGRAB, END_SCREENGRAB)
 
 def get_questions_and_answers(block_texts, block_bounds):
     """return a dict with `question` and array of `answers`"""
-    question = None
-    answers = []
+    question = block_texts[0]
+    answers = [block_texts[1], block_texts[2], block_texts[3]]
     for i, text in enumerate(block_texts):
-        bounds = block_bounds[i]
-        # the question is the first block
-        if (question is None and is_question_block(bounds)):
-            question = text
-        elif len(answers) <= 3 and not text.isnumeric():
-            answers.append(text)
-        elif len(answers) == 3:
-            break  # reached total num
+        print("{}: {}".format(i, text))
 
     return {'question': question, 'answers': answers}
-
 
 def detect_text_with_bounds(path):
     """
     Detects text in the file with bounds.
     Returns a tuple of the block texts and block bounds
     """
-    START_DOC_OCR = time.time()
+    # START_DOC_OCR = time.time()
 
     with io.open(path, 'rb') as image_file:
         content = image_file.read()
@@ -82,8 +72,8 @@ def detect_text_with_bounds(path):
     response = client.document_text_detection(image=image)
     document = response.full_text_annotation
 
-    END_DOC_OCR = time.time()
-    logit("DOC OCR", START_DOC_OCR, END_DOC_OCR)
+    # END_DOC_OCR = time.time()
+    # logit("DOC OCR", START_DOC_OCR, END_DOC_OCR)
 
     block_bounds = []
     block_texts = []
@@ -99,7 +89,7 @@ def detect_text_with_bounds(path):
             block_words_mapped = list(map(map_words, block_words))
 
             block_text = ' '.join(block_words_mapped)
-            print('Block Content: {}'.format(block_text))
+            # print('Block Content: {}'.format(block_text))
             # print('Block Bounds:\n {}'.format(block.bounding_box))
             block_texts.append(block_text)
             block_bounds.append(block.bounding_box)
