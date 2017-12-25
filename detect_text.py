@@ -1,6 +1,7 @@
 import time
 import io
 import os
+import webbrowser
 
 # load config
 import json
@@ -25,6 +26,13 @@ from screengrab import screenshot
 IMAGE_PATH = os.path.join(
     os.path.dirname(__file__), data["LOCAL"]["IMAGE_PATH"])
 
+# List of words to clean from the question
+WORDS_TO_STRIP = [
+    'who', 'what', 'where', 'when', 'of', 'and', 'that', 'have', 'for',
+    'on', 'with', 'as', 'this', 'by', 'from', 'they', 'a', 'an', 'and', 'my',
+    'in', 'to', '?', ',', 'these'
+]
+
 def logit(tag, start, end):
     print("\n ====== {} TOTAL TIME: {} =====".format(tag,
                                                      ((end - start) * 1000.0)))
@@ -33,13 +41,13 @@ def logit(tag, start, end):
 client = vision.ImageAnnotatorClient(credentials=scoped_credentials)
 
 # MAIN METHOD TO EXPORT
-def parse_screenshot(path):
+def parse_screenshot(path, should_launch=True):
     # 1. Grab the screenshot
     take_screenshot(path)
     # 2. Parse for the block texts
     texts_and_bounds = detect_text_with_bounds(path)
     # 3. Parse into questions and answers
-    questions_and_answers = get_questions_and_answers(*texts_and_bounds)
+    questions_and_answers = get_questions_and_answers(*texts_and_bounds, should_launch=True)
     # print("{}".format(questions_and_answers))
     return questions_and_answers
 
@@ -50,14 +58,34 @@ def take_screenshot(path):
     # END_SCREENGRAB = time.time()
     # logit("SCREENGRAB", START_SCREENGRAB, END_SCREENGRAB)
 
-def get_questions_and_answers(block_texts, block_bounds):
-    """return a dict with `question` and array of `answers`"""
-    question = block_texts[0]
-    answers = [block_texts[1], block_texts[2], block_texts[3]]
+def get_questions_and_answers(block_texts, block_bounds, should_launch=True):
+    """
+    - return a dict with `question` and array of `answers` (attempt to get 3)
+    - launches the question in web browser
+    """
+
     for i, text in enumerate(block_texts):
         print("{}: {}".format(i, text))
+    question = block_texts[0]
+
+    # launch in browser as soon as we have the question
+    if (should_launch):
+        launch_web(question)
+
+    answers = []
+    num = 1
+    while (num <= 3 and num < len(block_texts)):
+        answers.append(block_texts[num])  # 1,2,3
+        num += 1
 
     return {'question': question, 'answers': answers}
+
+# launch with clean question
+def launch_web(original_question):
+    words = original_question.split()
+    words = [word for word in words if word.lower() not in WORDS_TO_STRIP]
+    url = "https://www.google.com.tr/search?q={}".format(' '.join(words))
+    webbrowser.open_new_tab(url)
 
 def detect_text_with_bounds(path):
     """
