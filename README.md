@@ -16,7 +16,9 @@ git secret reveal
 // position quicktime player at top left -> select New Movie Recording
 // open recording button dropdown -> switch Movie recording to iphone
 
-// run the full script and compare which has the most results
+// run the full script:
+// - will launch browser to google search of the question
+// - in terminal, prints out the search results count for each q+a search (usually, take the  one with largest count)
 python main.py
 ```
 
@@ -24,14 +26,15 @@ python main.py
 
 USAGE: `from screengrab import screenshot`
 
-- Quicktime must be positioned at top left
+- Quicktime player must be positioned at top left of screen, on iPhone recording
 - Uses PILLOW imagegrab - bounding box grabs only question + the multiple choice answers
 
 ### 2 - OCR detect text
 
 USAGE: `from detect_text import parse_screenshot`
 
-Process screenshot into question + answers.
+- Processes screenshot into question + answers
+- Launches browser to google search of the question
 
 Google Cloud Vision: uses [api-project](https://console.cloud.google.com/apis/dashboard?project=api-project-244156348570&authuser=1&duration=PT1H) for creds:
 https://googlecloudplatform.github.io/google-cloud-python/latest/vision/index.html
@@ -56,3 +59,7 @@ answer: Oklahoma === TOTAL: 1,180,000
 answer: North Dakota === TOTAL: 1,360,000
 answer: Alaska === TOTAL: 1,330,000
 ```
+
+Notes:
+- if the question is a "not" question ("which of these is NOT...") take the lowest num
+- not unusual to be the second largest 
