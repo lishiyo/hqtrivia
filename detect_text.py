@@ -25,17 +25,14 @@ from google.cloud.vision import types
 from screengrab import screenshot
 IMAGE_PATH = os.path.join(
     os.path.dirname(__file__), data["LOCAL"]["IMAGE_PATH"])
+from utils import logit
 
-# List of words to clean from the question
+# List of words to clean from the question during google search
 WORDS_TO_STRIP = [
     'who', 'what', 'where', 'when', 'of', 'and', 'that', 'have', 'for',
     'on', 'with', 'as', 'this', 'by', 'from', 'they', 'a', 'an', 'and', 'my',
     'in', 'to', '?', ',', 'these'
 ]
-
-def logit(tag, start, end):
-    print("\n ====== {} TOTAL TIME: {} =====".format(tag,
-                                                     ((end - start) * 1000.0)))
 
 # Instantiates a Google Vision client with explicit creds
 client = vision.ImageAnnotatorClient(credentials=scoped_credentials)
@@ -63,9 +60,6 @@ def get_questions_and_answers(block_texts, block_bounds, should_launch=True):
     - return a dict with `question` and array of `answers` (attempt to get 3)
     - launches the question in web browser
     """
-
-    for i, text in enumerate(block_texts):
-        print("{}: {}".format(i, text))
     question = block_texts[0]
 
     # launch in browser as soon as we have the question
@@ -73,11 +67,15 @@ def get_questions_and_answers(block_texts, block_bounds, should_launch=True):
         launch_web(question)
 
     answers = []
-    num = 1
-    while (num <= 3 and num < len(block_texts)):
-        answers.append(block_texts[num])  # 1,2,3
-        num += 1
+    answerIndex = 1 # should only ever be 3 answers (indices 1-3)
+    while (answerIndex <= 3 and answerIndex < len(block_texts)):
+        answers.append(block_texts[answerIndex]) 
+        answerIndex += 1
 
+    # print out answers for debugging
+    for i, text in enumerate(answers):
+            print("{}: {}".format(i, text))
+            
     return {'question': question, 'answers': answers}
 
 # launch with clean question
@@ -124,42 +122,11 @@ def detect_text_with_bounds(path):
 
     return (block_texts, block_bounds)
 
-
-# def detect_text(path):
-#     """Detects text in the file."""
-
-#     START_OCR = time.time()
-#     with io.open(path, 'rb') as image_file:
-#         content = image_file.read()
-
-#     image = types.Image(content=content)
-
-#     response = client.text_detection(image=image)
-#     # https://cloud.google.com/vision/docs/reference/rest/v1/images/annotate#textannotation
-#     texts = response.text_annotations
-
-#     END_OCR = time.time()
-#     logit("OCR", START_OCR, END_OCR)
-
-#     for text in texts:
-#         print('\n DESCRIPTION: "{}"'.format(text.description))
-#         if hasattr(text, 'bounding_poly'):
-#             vertices = ([
-#                 '({},{})'.format(vertex.x, vertex.y)
-#                 for vertex in text.bounding_poly.vertices
-#             ])
-#             print('bounds: {}'.format(','.join(vertices)))
-#             print("TEXT FULL: {}".format(text))
-#         else:
-#             print("no bounding_poly")
-
-
 def is_question_block(bounding_box):
     """incredibly quick-and-dirty check to see if this is probably a question"""
     top_left = bounding_box.vertices[0]
     bottom_right = bounding_box.vertices[3]
     return bottom_right.y - top_left.y > 100
-
 
 def map_words(word):
     characters = list(map(lambda symbol: symbol.text, word.symbols))

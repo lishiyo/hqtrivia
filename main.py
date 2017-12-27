@@ -1,8 +1,8 @@
 # will take screenshot => output/screenshot.png
-from detect_text import parse_screenshot, logit, IMAGE_PATH
+from detect_text import parse_screenshot, IMAGE_PATH
 from google_search import run_query_all
+from utils import logit
 import time
-
 
 START_FULL = time.time()
 
