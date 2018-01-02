@@ -8,9 +8,8 @@ Usage:
 workon venv 
 pip install -r requirements.txt
 
-// either create config.json and credentials.json (service credentials)
-// or grab from git-secret
-git secret reveal 
+// download a credentials.json service credentials file from a Google Vision-enabled Cloud Platform project (see OCR section below)
+// then create config.json following config.json.sample
 
 // connect iphone to Mac
 // position quicktime player at top left -> select New Movie Recording
@@ -36,11 +35,11 @@ USAGE: `from detect_text import parse_screenshot`
 - Processes screenshot into question + answers
 - Launches browser to google search of the question
 
-Google Cloud Vision: uses [api-project](https://console.cloud.google.com/apis/dashboard?project=api-project-244156348570&authuser=1&duration=PT1H) for creds:
-https://googlecloudplatform.github.io/google-cloud-python/latest/vision/index.html
-https://cloud.google.com/vision/docs/detecting-fulltext
+This uses Google Cloud Vision api, so make sure you've downloaded a service account file from a Google Cloud project that has [enabled Google Cloud Vision](https://cloud.google.com/vision/docs/before-you-begin). See "using a service account": https://cloud.google.com/vision/docs/auth
 
-`py detect_text.py` returns dict:
+Then add the path of that service account json file `config.json` as `CREDENTIALS_PATH`.
+
+`py detect_text.py` returns a dict:
 ```
 {
     question: 'After Texas , what U . S . state produces the most crude oil ?'
@@ -61,5 +60,5 @@ answer: Alaska === TOTAL: 1,330,000
 ```
 
 Notes:
-- if the question is a "not" question ("which of these is NOT...") take the lowest num
-- not unusual to be the second largest 
+- if the question is a "not" question ("which of these is NOT...") take the one with the lowest count
+- it's not unusual for the answer to be the second largest
